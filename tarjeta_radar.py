@@ -7,6 +7,15 @@ Genera public/tarjeta.png (1080x1350) para publicar en Facebook e Instagram.
 Ese mismo archivo es el og:image del sitio, así que cada liga compartida sale
 con imagen en vez del recuadro gris.
 
+Criterios de diseño:
+  · El dominio se lee sin esfuerzo: la gente ve la imagen en el muro, no la liga.
+  · Nada por debajo de 26 px. A 1080 de ancho, en un celular la imagen se ve a
+    ~400 px: todo lo que baje de 26 px se vuelve ilegible.
+  · No se publican tres cifras iguales. Torreón, Gómez y Lerdo caen en la misma
+    celda de los modelos globales; si la diferencia entre ellas no llega a 1 °C
+    se publica una sola cifra para la comarca. Solo cuando de verdad difieren se
+    abre el desglose por ciudad.
+
 USO:
     python3 tarjeta_radar.py                    # usa public/datos.json
     python3 tarjeta_radar.py --datos otro.json --salida public/tarjeta.png
@@ -37,6 +46,10 @@ PANEL = (17, 40, 63)
 VERDE = (74, 222, 128)
 ROJO = (251, 113, 133)
 
+# Nada por debajo de esto se publica: a 1080 px de ancho, en un muro de celular
+# la imagen se ve a ~400 px y 26 px se convierten en 10 px reales.
+MIN_LEGIBLE = 26
+
 RUTAS_FUENTE = [
     os.path.join(os.path.dirname(os.path.abspath(__file__)), "fonts", "Poppins-%s.ttf"),
     "/usr/share/fonts/truetype/poppins/Poppins-%s.ttf",
@@ -53,16 +66,25 @@ DIAS = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Doming
 MESES = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio",
          "agosto", "septiembre", "octubre", "noviembre", "diciembre"]
 
+_CACHE = {}
+
 
 def fuente(peso, tam):
+    clave = (peso, tam)
+    if clave in _CACHE:
+        return _CACHE[clave]
+    f = None
     for patron in RUTAS_FUENTE:
         ruta = patron % peso
         if os.path.exists(ruta):
-            return ImageFont.truetype(ruta, tam)
-    alt = RESPALDO.get(peso)
-    if alt and os.path.exists(alt):
-        return ImageFont.truetype(alt, tam)
-    return ImageFont.load_default()
+            f = ImageFont.truetype(ruta, tam)
+            break
+    if f is None:
+        alt = RESPALDO.get(peso)
+        f = ImageFont.truetype(alt, tam) if alt and os.path.exists(alt) \
+            else ImageFont.load_default()
+    _CACHE[clave] = f
+    return f
 
 
 # --------------------------------------------------------------------------
@@ -94,6 +116,19 @@ def anillos(img, cx, cy, radios):
 def centrar(d, texto, f, y, color, x0=0, x1=W):
     ancho = d.textlength(texto, font=f)
     d.text(((x0 + x1 - ancho) / 2, y), texto, font=f, fill=color)
+
+
+def derecha(d, texto, f, x, y, color):
+    d.text((x - d.textlength(texto, font=f), y), texto, font=f, fill=color)
+
+
+def ajustar(d, texto, peso, tam, ancho_max, minimo=MIN_LEGIBLE):
+    """Baja el tamaño hasta que el texto quepa, nunca por debajo de `minimo`."""
+    while tam > minimo:
+        if d.textlength(texto, font=fuente(peso, tam)) <= ancho_max:
+            break
+        tam -= 2
+    return fuente(peso, tam)
 
 
 def barra(d, x, y, ancho, alto, pct, color=CIAN):
@@ -129,6 +164,8 @@ def redondear(p, paso=5):
 
 
 def texto_pct(p):
+    if p is None:
+        return "—"
     if 0 < p < 2.5:
         return "<5%"
     if 97.5 < p < 100:
@@ -136,100 +173,172 @@ def texto_pct(p):
     return "%d%%" % redondear(p)
 
 
+def temperatura_util(ciudades):
+    """Decide si vale la pena desglosar la temperatura por ciudad.
+
+    Devuelve (modo, filas). El modo es "comarca" cuando las tres coinciden
+    dentro de 1 °C —publicar tres veces la misma cifra finge un detalle que los
+    modelos globales no tienen— y "ciudades" cuando de verdad difieren.
+    """
+    filas = [(c["nombre"], c["dias"][0]) for c in ciudades.values()]
+    if not filas:
+        return "comarca", []
+    maxs = [f[1]["tmax"] for f in filas]
+    mins = [f[1]["tmin"] for f in filas]
+    if (max(maxs) - min(maxs) < 1.0) and (max(mins) - min(mins) < 1.0):
+        return "comarca", filas
+    return "ciudades", filas
+
+
 def construir(datos, salida="public/tarjeta.png"):
     hoy = datos["comarca"][0]
     p = hoy["prob_pct"]["1.0"]
     centros = hoy["por_centro_pct"]
     nombres = {c["clave"]: c["nombre"] for c in datos["centros"]}
+    acum = hoy.get("acumulado_mm") or {}
 
-    ciudades = [(c["nombre"], c["dias"][0]) for c in datos["ciudades"].values()]
-    tmax_ref = ciudades[0][1]["tmax"] if ciudades else None
+    modo, filas = temperatura_util(datos["ciudades"])
+    tmax_ref = filas[0][1]["tmax"] if filas else None
 
     img = Image.new("RGBA", (W, H), FONDO_A)
     degradado(img)
     anillos(img, W // 2, 300, [180, 300, 430, 570, 720])
     d = ImageDraw.Draw(img, "RGBA")
 
-    # Encabezado
-    d.text((70, 60), "RADAR", font=fuente("Bold", 38), fill=BLANCO)
-    d.text((70, 100), "LAGUNERO", font=fuente("Light", 38), fill=CIAN)
+    # ------------------------------------------------------------------
+    # Retícula vertical. Se define de arriba abajo con alturas explícitas
+    # para que ningún bloque invada al siguiente cuando cambien las cifras.
+    # ------------------------------------------------------------------
+    Y_TITULAR   = 190
+    Y_CIFRA     = 272
+    Y_SUBTITULO = 430
+    Y_RANGO     = 500
+    Y_CENTROS   = 560          # encabezado "LO QUE DICE CADA CENTRO"
+    PASO_CENTRO = 48
+    Y_LLUVIA    = 856          # panel "si llueve, ¿cuánta?"
+    ALTO_LLUVIA = 132
+    Y_ACUMULADO = 1000
+    Y_TEMP      = 1048
+    ALTO_TEMP   = 124
+    Y_BANDA     = H - 166      # franja del dominio
+
+    # ---------------------------------------------------------- Encabezado
+    d.text((70, 52), "RADAR", font=fuente("Bold", 40), fill=BLANCO)
+    d.text((70, 94), "LAGUNERO", font=fuente("Light", 40), fill=CIAN)
     f = datetime.strptime(hoy["fecha"], "%Y-%m-%d")
     fecha = "%s %d de %s" % (DIAS[f.weekday()], f.day, MESES[f.month - 1])
-    ft = fuente("Medium", 23)
-    d.text((W - 70 - d.textlength(fecha.upper(), font=ft), 78), fecha.upper(),
-           font=ft, fill=GRIS)
-    d.line([(70, 172), (W - 70, 172)], fill=CIAN_T, width=2)
+    derecha(d, fecha.upper(), fuente("Medium", MIN_LEGIBLE), W - 70, 74, GRIS)
+    d.line([(70, 168), (W - 70, 168)], fill=CIAN_T, width=2)
 
-    # Titular y cifra
+    # ---------------------------------------------------- Titular y cifra
     txt, color = veredicto(p, tmax_ref)
-    tam = 74 if len(txt) <= 16 else 52
-    centrar(d, txt, fuente("Bold", tam), 224, color)
-
-    centrar(d, texto_pct(p), fuente("Bold", 132), 316, BLANCO)
+    centrar(d, txt, ajustar(d, txt, "Bold", 74, W - 140, minimo=44),
+            Y_TITULAR, color)
+    centrar(d, texto_pct(p), fuente("Bold", 126), Y_CIFRA, BLANCO)
     centrar(d, "de que caiga más de 1 mm de lluvia",
-            fuente("Light", 29), 472, GRIS)
+            fuente("Light", 30), Y_SUBTITULO, GRIS)
 
-    # Rango entre centros: la honestidad, en una sola imagen
+    # Rango entre centros: el desacuerdo, dibujado. Las cifras exactas de los
+    # extremos no se rotulan aquí porque vienen abajo, centro por centro.
     vals = sorted(centros.values())
     lo, hi = redondear(vals[0]), redondear(vals[-1])
-    bx, bw, by = 150, W - 300, 540
-    barra(d, bx, by, bw, 18, 100, (255, 255, 255, 22))
-    d.rounded_rectangle([bx + bw * lo / 100, by, bx + bw * hi / 100, by + 18],
-                        radius=9, fill=CIAN + (110,))
+    bx, bw = 150, W - 300
+    barra(d, bx, Y_RANGO, bw, 18, 100, (255, 255, 255, 22))
+    d.rounded_rectangle([bx + bw * lo / 100, Y_RANGO,
+                         bx + bw * hi / 100, Y_RANGO + 18], radius=9,
+                        fill=CIAN + (110,))
     mx = bx + bw * redondear(p) / 100
-    d.rounded_rectangle([mx - 3, by - 7, mx + 3, by + 25], radius=3, fill=BLANCO)
-    d.text((bx, by + 34), "más seco %d%%" % lo, font=fuente("Light", 22), fill=GRIS)
-    t2 = "más lluvioso %d%%" % hi
-    d.text((bx + bw - d.textlength(t2, font=fuente("Light", 22)), by + 34), t2,
-           font=fuente("Light", 22), fill=GRIS)
+    d.rounded_rectangle([mx - 3, Y_RANGO - 7, mx + 3, Y_RANGO + 25],
+                        radius=3, fill=BLANCO)
 
-    # Los cuatro centros
-    y = 630
-    d.text((70, y), "LO QUE DICE CADA CENTRO", font=fuente("Bold", 25), fill=CIAN)
-    y += 48
+    # ------------------------------------------------- Los cuatro centros
+    d.text((70, Y_CENTROS), "LO QUE DICE CADA CENTRO",
+           font=fuente("Bold", 27), fill=CIAN)
+    y = Y_CENTROS + 46
     for clave in ["gfs025", "icon_seamless", "ecmwf_ifs025", "gem_global"]:
         if clave not in centros:
             continue
-        d.text((78, y), nombres.get(clave, clave), font=fuente("Medium", 27), fill=BLANCO)
-        barra(d, 240, y + 10, W - 240 - 190, 16, centros[clave])
-        v = texto_pct(centros[clave])
-        d.text((W - 70 - d.textlength(v, font=fuente("Bold", 28)), y - 2), v,
-               font=fuente("Bold", 28), fill=CIAN)
-        y += 56
+        d.text((78, y), nombres.get(clave, clave),
+               font=fuente("Medium", 29), fill=BLANCO)
+        barra(d, 240, y + 12, W - 240 - 190, 16, centros[clave])
+        derecha(d, texto_pct(centros[clave]), fuente("Bold", 30), W - 70, y - 3, CIAN)
+        y += PASO_CENTRO
 
     conf = hoy["confianza_lluvia"]
-    col = {"ALTA": VERDE, "MEDIA": AMBAR, "BAJA": ROJO}[conf]
-    d.text((78, y + 6), "Diferencia entre ellos: %d puntos  ·  confianza %s"
+    col = {"ALTA": VERDE, "MEDIA": AMBAR, "BAJA": ROJO}.get(conf, GRIS)
+    d.text((78, y + 2), "Diferencia entre ellos: %d puntos  ·  confianza %s"
            % (round(hoy["desacuerdo_pts"] or 0), conf.lower()),
-           font=fuente("Light", 24), fill=col)
+           font=fuente("Light", 27), fill=col)
 
-    # Temperatura por ciudad
-    y += 76
-    d.rounded_rectangle([70, y, W - 70, y + 148], radius=24, fill=PANEL,
-                        outline=CIAN_T, width=1)
-    ancho = (W - 140) / max(len(ciudades), 1)
-    for i, (nombre, dia) in enumerate(ciudades):
-        x0 = 70 + i * ancho
-        centrar(d, nombre.upper(), fuente("Medium", 23), y + 26, GRIS, x0, x0 + ancho)
-        centrar(d, "%.0f°" % dia["tmax"], fuente("Bold", 54), y + 58, AMBAR,
+    # ---------------------------------------------------- ¿Cuánta lluvia?
+    # Esto sí cambia todos los días: qué tan probable es que solo caigan gotas,
+    # que se note, o que sea un aguacero de verdad.
+    d.rounded_rectangle([70, Y_LLUVIA, W - 70, Y_LLUVIA + ALTO_LLUVIA],
+                        radius=22, fill=PANEL, outline=CIAN_T, width=1)
+    d.text((98, Y_LLUVIA + 14), "SI LLUEVE, ¿CUÁNTA?",
+           font=fuente("Bold", MIN_LEGIBLE), fill=CIAN)
+    escala = [("Gotas", "0.2"), ("Se nota", "1.0"),
+              ("Fuerte", "5.0"), ("Aguacero", "20.0")]
+    ancho = (W - 200) / len(escala)
+    for i, (etiqueta, umbral) in enumerate(escala):
+        v = hoy["prob_pct"].get(umbral)
+        x0 = 100 + i * ancho
+        # El umbral del titular va en cian para que se vea que la cifra grande
+        # de arriba es esta misma columna, no un número aparte.
+        titular = umbral == "1.0"
+        tinta = CIAN if titular else (BLANCO if v else GRIS)
+        centrar(d, texto_pct(v), fuente("Bold", 42), Y_LLUVIA + 48, tinta,
                 x0, x0 + ancho)
-        centrar(d, "mín %.0f°" % dia["tmin"], fuente("Light", 22), y + 116, GRIS,
-                x0, x0 + ancho)
+        centrar(d, etiqueta, fuente("Medium" if titular else "Light", MIN_LEGIBLE),
+                Y_LLUVIA + 94, CIAN if titular else GRIS, x0, x0 + ancho)
 
-    # Método, en una línea
-    y += 178
-    d.rounded_rectangle([70, y, W - 70, y + 96], radius=22,
-                        fill=(10, 30, 50, 220), outline=CIAN, width=2)
-    centrar(d, "%d escenarios de %d centros meteorológicos"
-            % (datos["miembros"], len(centros)), fuente("Bold", 30), y + 18, BLANCO)
-    centrar(d, "Se cuenta cuántos superan 1 mm. Sin pesos ni ajustes.",
-            fuente("Light", 24), y + 56, GRIS)
+    if acum.get("p50") is not None:
+        centrar(d, "Lo más probable: %.1f mm  ·  si se pone feo: %.1f mm"
+                % (acum["p50"], acum.get("p90") or acum["p50"]),
+                fuente("Light", MIN_LEGIBLE), Y_ACUMULADO, GRIS)
 
-    # Pie
-    centrar(d, "radarlagunero.com  ·  método y aciertos publicados",
-            fuente("Medium", 24), H - 92, CIAN)
+    # ------------------------------------------------------- Temperatura
+    # Una sola cifra cuando las tres ciudades coinciden: publicar 35°, 35° y 35°
+    # no informa a nadie, solo llena espacio.
+    d.rounded_rectangle([70, Y_TEMP, W - 70, Y_TEMP + ALTO_TEMP],
+                        radius=22, fill=PANEL, outline=CIAN_T, width=1)
+    raf = filas[0][1].get("rafaga_kmh") if filas else None
+
+    if modo == "comarca" and filas:
+        dia = filas[0][1]
+        centrar(d, "TODA LA COMARCA", fuente("Medium", MIN_LEGIBLE),
+                Y_TEMP + 10, GRIS)
+        d.text((140, Y_TEMP + 44), "máx %.0f°" % dia["tmax"],
+               font=fuente("Bold", 54), fill=AMBAR)
+        derecha(d, "mín %.0f°" % dia["tmin"], fuente("Bold", 54), W - 140,
+                Y_TEMP + 44, BLANCO)
+        if raf:
+            centrar(d, "ráfagas", fuente("Light", MIN_LEGIBLE),
+                    Y_TEMP + 50, GRIS)
+            centrar(d, "%.0f km/h" % raf, fuente("Medium", MIN_LEGIBLE),
+                    Y_TEMP + 80, GRIS)
+    else:
+        ancho = (W - 140) / max(len(filas), 1)
+        for i, (nombre, dia) in enumerate(filas):
+            x0 = 70 + i * ancho
+            centrar(d, nombre.upper(), fuente("Medium", MIN_LEGIBLE),
+                    Y_TEMP + 10, GRIS, x0, x0 + ancho)
+            centrar(d, "%.0f°" % dia["tmax"], fuente("Bold", 50),
+                    Y_TEMP + 40, AMBAR, x0, x0 + ancho)
+            centrar(d, "mín %.0f°" % dia["tmin"], fuente("Light", MIN_LEGIBLE),
+                    Y_TEMP + 92, GRIS, x0, x0 + ancho)
+
+    # ------------------------------------------------------------- Pie
+    # La franja del dominio: es lo que convierte una imagen compartida en una
+    # visita al sitio. Va grande, con contraste y de ancho completo.
+    d.rectangle([0, Y_BANDA, W, H], fill=(7, 20, 36))
+    d.line([(0, Y_BANDA), (W, Y_BANDA)], fill=CIAN, width=3)
+    centrar(d, "radarlagunero.com", fuente("Bold", 60), Y_BANDA + 14, CIAN)
+    centrar(d, "%d escenarios de %d centros  ·  método y aciertos publicados"
+            % (datos["miembros"], len(centros)),
+            fuente("Light", MIN_LEGIBLE), Y_BANDA + 92, BLANCO)
     centrar(d, "Avisos oficiales: SMN / CONAGUA y Protección Civil",
-            fuente("Light", 21), H - 56, GRIS)
+            fuente("Light", MIN_LEGIBLE), Y_BANDA + 124, GRIS)
 
     os.makedirs(os.path.dirname(salida) or ".", exist_ok=True)
     img.convert("RGB").save(salida, "PNG", optimize=True)

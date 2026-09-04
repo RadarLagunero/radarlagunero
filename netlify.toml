@@ -1,0 +1,30 @@
+# Radar Lagunero — configuracion de Netlify
+# El sitio es estatico: build_sitio.py escribe public/ y Netlify lo sirve.
+# El HTML ya viene generado en el repo (lo actualiza GitHub Actions cada hora),
+# asi que si la consulta a los modelos falla durante el deploy, el sitio no
+# se cae: se publica el ultimo pronostico bueno.
+
+[build]
+  command = "python3 build_sitio.py --dias 7"
+  publish = "public"
+
+[build.environment]
+  PYTHON_VERSION = "3.11"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+
+# El pronostico cambia cada hora: que el CDN no lo congele.
+[[headers]]
+  for = "/index.html"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+[[headers]]
+  for = "/datos.json"
+  [headers.values]
+    Cache-Control = "public, max-age=600"
+    Access-Control-Allow-Origin = "*"

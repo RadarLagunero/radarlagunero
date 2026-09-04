@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="es-MX">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Clima en Torreón hoy | Puede llover hoy — Radar Lagunero</title>
+<meta name="description" content="Clima en Torreón, Gómez Palacio y Lerdo: 60% de probabilidad de lluvia hoy, máxima de 35°. Consenso de 5 modelos numéricos y ensemble del GFS, con la confianza del pronóstico a la vista.">
+<link rel="canonical" href="https://radarlagunero.com/">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<meta name="theme-color" content="#091829">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Radar Lagunero">
+<meta property="og:locale" content="es_MX">
+<meta property="og:title" content="Clima en Torreón hoy: Puede llover hoy">
+<meta property="og:description" content="Clima en Torreón, Gómez Palacio y Lerdo: 60% de probabilidad de lluvia hoy, máxima de 35°. Consenso de 5 modelos numéricos y ensemble del GFS, con la confianza del pronóstico a la vista.">
+<meta property="og:url" content="https://radarlagunero.com/">
+<meta property="og:image" content="https://radarlagunero.com/tarjeta.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap">
+<style>
+:root{
+  --fondo:#091829; --fondo2:#102E4A; --panel:#11283F; --linea:#1E5C82;
+  --cian:#38BDF8; --ambar:#F59E0B; --hueso:#F8FAFC; --gris:#94A3B8;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:'Poppins',system-ui,-apple-system,'Segoe UI',sans-serif;
+  background:var(--fondo);color:var(--hueso);line-height:1.55;
+  background-image:linear-gradient(180deg,var(--fondo) 0%,var(--fondo2) 100%);
+  background-attachment:fixed;
+}
+.env{max-width:1080px;margin:0 auto;padding:0 20px}
+a{color:var(--cian)}
+
+/* anillos de radar: la marca de agua de la marca */
+.radar{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.radar span{
+  position:absolute;left:50%;top:-120px;transform:translateX(-50%);
+  border:1px solid rgba(56,189,248,.10);border-radius:50%;
+}
+main,header.top,footer{position:relative;z-index:1}
+
+header.top{padding:26px 0 18px;border-bottom:1px solid var(--linea)}
+.marca{display:flex;align-items:baseline;gap:9px;letter-spacing:.06em}
+.marca b{font-weight:700;font-size:1.35rem}
+.marca span{font-weight:300;font-size:1.35rem;color:var(--cian)}
+.top .env{display:flex;justify-content:space-between;align-items:center;
+  flex-wrap:wrap;gap:10px}
+.sello{font-size:.78rem;color:var(--gris);text-align:right}
+
+.hero{padding:46px 0 8px;text-align:center}
+.hero .fecha{color:var(--gris);text-transform:uppercase;letter-spacing:.14em;
+  font-size:.8rem}
+.hero h1{font-size:clamp(2rem,6vw,3.4rem);font-weight:700;line-height:1.1;
+  margin:12px 0 6px;color:var(--cian)}
+.hero h1.calor{color:var(--ambar)}
+.hero .sub{color:var(--gris);font-weight:300;font-size:clamp(1rem,2.6vw,1.3rem)}
+.hero .prob{font-size:clamp(3rem,12vw,5.5rem);font-weight:700;line-height:1;
+  margin:18px 0 2px}
+.hero .prob small{font-size:.9rem;font-weight:300;color:var(--gris);
+  display:block;letter-spacing:.1em;text-transform:uppercase;margin-top:6px}
+.lectura{max-width:640px;margin:22px auto 0;color:var(--hueso);
+  font-weight:300;font-size:1.05rem}
+
+.badge{display:inline-block;padding:4px 13px;border-radius:999px;
+  font-size:.74rem;letter-spacing:.1em;text-transform:uppercase;
+  border:1px solid currentColor;margin-top:16px}
+.c-alta{color:#4ADE80}.c-media{color:var(--ambar)}.c-baja{color:#FB7185}
+
+section{padding:38px 0}
+h2{font-size:1.05rem;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--cian);font-weight:600;margin-bottom:18px}
+h2 small{display:block;text-transform:none;letter-spacing:0;color:var(--gris);
+  font-weight:300;font-size:.9rem;margin-top:6px}
+
+.ciudades{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
+.ciudad{background:var(--panel);border:1px solid var(--linea);border-radius:18px;
+  padding:20px 22px}
+.ciudad.destacada{border-color:var(--cian)}
+.ciudad header{display:flex;justify-content:space-between;align-items:baseline;
+  gap:10px}
+.ciudad h3{font-size:1.15rem;font-weight:600}
+.temps{color:var(--ambar);font-size:1.15rem;font-weight:500}
+.temps span{color:var(--gris);font-weight:300}
+.titularin{font-size:.9rem;color:var(--gris);margin-top:2px}
+.fila-barra{display:flex;align-items:center;gap:12px;margin:14px 0 8px}
+.pct{color:var(--cian);font-size:1.3rem;font-weight:700;min-width:62px;
+  text-align:right}
+.barra{flex:1;height:12px;border-radius:99px;background:rgba(255,255,255,.09);
+  border:1px solid var(--linea);overflow:hidden}
+.barra span{display:block;height:100%;background:var(--cian);border-radius:99px}
+.detalle{font-size:.85rem;color:var(--gris);font-weight:300}
+.confianza{font-size:.76rem;margin-top:10px;letter-spacing:.05em;
+  text-transform:uppercase}
+
+.pestanas{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.pestanas button{background:transparent;border:1px solid var(--linea);
+  color:var(--gris);padding:7px 16px;border-radius:999px;cursor:pointer;
+  font-family:inherit;font-size:.85rem}
+.pestanas button[aria-selected="true"]{border-color:var(--cian);
+  color:var(--cian);background:rgba(56,189,248,.08)}
+
+.panel-ciudad[hidden]{display:none}
+.tira{list-style:none;display:grid;gap:10px;
+  grid-template-columns:repeat(auto-fit,minmax(112px,1fr))}
+.tira li{background:var(--panel);border:1px solid var(--linea);border-radius:14px;
+  padding:14px 12px;text-align:center}
+.tira .dia{display:block;font-size:.78rem;color:var(--gris);
+  text-transform:uppercase;letter-spacing:.08em}
+.tira .t{display:block;margin:8px 0 10px;color:var(--ambar);font-weight:500}
+.tira .t i{color:var(--gris);font-style:normal;font-weight:300}
+.tira .p{display:block;margin-top:8px;color:var(--cian);font-weight:600}
+.tira .cf{display:block;font-size:.7rem;margin-top:4px;letter-spacing:.06em;
+  text-transform:uppercase}
+
+.metodo{background:rgba(10,30,50,.75);border:1px solid var(--cian);
+  border-radius:20px;padding:26px 24px}
+.metodo .kv{display:flex;justify-content:space-between;align-items:center;
+  gap:14px;padding:11px 0;border-bottom:1px solid rgba(30,92,130,.5);
+  font-weight:300;color:var(--gris);flex-wrap:wrap}
+.metodo .kv:last-of-type{border-bottom:0}
+.metodo .kv b{color:var(--hueso);font-weight:500}
+.puntos{display:inline-flex;gap:7px;margin-left:auto}
+.puntos i{width:13px;height:13px;border-radius:50%;border:2px solid var(--cian);
+  display:block}
+.puntos i.on{background:var(--cian)}
+
+.subt{margin:26px 0 0;font-size:.8rem;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--gris);font-weight:400}
+.modelos{width:100%;border-collapse:collapse;margin-top:10px;font-size:.86rem;
+  font-weight:300;display:block;overflow-x:auto;white-space:nowrap}
+.modelos th,.modelos td{padding:9px 12px;text-align:right;
+  border-bottom:1px solid rgba(30,92,130,.45)}
+.modelos th:first-child,.modelos td:first-child{text-align:left}
+.modelos thead th{color:var(--cian);font-weight:500;font-size:.74rem;
+  letter-spacing:.08em;text-transform:uppercase}
+.modelos tfoot th{color:var(--hueso);font-weight:600;border-bottom:0;
+  border-top:1px solid var(--cian)}
+
+.faq details{background:var(--panel);border:1px solid var(--linea);
+  border-radius:14px;padding:16px 20px;margin-bottom:10px}
+.faq summary{cursor:pointer;font-weight:500}
+.faq p{color:var(--gris);font-weight:300;margin-top:10px}
+
+.aviso{border-left:3px solid var(--ambar);padding:12px 18px;color:var(--gris);
+  font-weight:300;font-size:.92rem;background:rgba(245,158,11,.06);
+  border-radius:0 12px 12px 0}
+
+footer{border-top:1px solid var(--linea);padding:30px 0 46px;margin-top:26px;
+  color:var(--gris);font-weight:300;font-size:.85rem;text-align:center}
+footer p{margin-bottom:8px}
+</style>
+<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Organization", "@id": "https://radarlagunero.com/#org", "name": "Radar Lagunero", "url": "https://radarlagunero.com", "areaServed": "Comarca Lagunera, Coahuila y Durango, México", "description": "Pronóstico del tiempo para la Comarca Lagunera basado en el consenso de cinco modelos numéricos y el ensemble del GFS."}, {"@type": "WebSite", "@id": "https://radarlagunero.com/#web", "url": "https://radarlagunero.com", "name": "Radar Lagunero", "inLanguage": "es-MX", "publisher": {"@id": "https://radarlagunero.com/#org"}}, {"@type": "WebPage", "@id": "https://radarlagunero.com/#pagina", "url": "https://radarlagunero.com/", "name": "Clima en Torreón hoy — Radar Lagunero", "isPartOf": {"@id": "https://radarlagunero.com/#web"}, "datePublished": "2026-09-04T14:20:08.925506-06:00", "dateModified": "2026-09-04T14:20:08.925506-06:00"}, {"@type": "FAQPage", "@id": "https://radarlagunero.com/#faq", "isPartOf": {"@id": "https://radarlagunero.com/#pagina"}, "mainEntity": [{"@type": "Question", "name": "¿Va a llover hoy en Torreón?", "acceptedAnswer": {"@type": "Answer", "text": "Hay buenas posibilidades de que llueva en Torreón. La probabilidad ajustada es de 60%: 3 de 5 modelos numéricos dan lluvia y 21 de 30 miembros del ensemble del GFS también. La confianza del pronóstico es baja."}}, {"@type": "Question", "name": "¿Va a llover hoy en Gómez Palacio?", "acceptedAnswer": {"@type": "Answer", "text": "Hay buenas posibilidades de que llueva en Gómez Palacio. La probabilidad ajustada es de 56%: 2 de 5 modelos numéricos dan lluvia y 21 de 30 miembros del ensemble del GFS también. La confianza del pronóstico es baja."}}, {"@type": "Question", "name": "¿Va a llover hoy en Lerdo?", "acceptedAnswer": {"@type": "Answer", "text": "Hay buenas posibilidades de que llueva en Lerdo. La probabilidad ajustada es de 56%: 2 de 5 modelos numéricos dan lluvia y 21 de 30 miembros del ensemble del GFS también. La confianza del pronóstico es baja."}}, {"@type": "Question", "name": "¿Cómo calcula Radar Lagunero la probabilidad de lluvia?", "acceptedAnswer": {"@type": "Answer", "text": "Consultamos cinco modelos numéricos independientes —GFS (Estados Unidos), ECMWF (Europa), ICON (Alemania), GEM (Canadá) y ARPEGE (Francia)— más el ensemble del GFS de 31 miembros. La probabilidad ajustada pondera la fracción de miembros del ensemble con lluvia (50%), la probabilidad media que reportan los modelos (30%) y la fracción de modelos deterministas que dan lluvia (20%). Publicamos también el nivel de acuerdo entre modelos y la confianza del pronóstico, incluso cuando es baja."}}]}]}</script>
+</head>
+<body>
+<div class="radar" aria-hidden="true"><span style="width:360px;height:360px;margin-top:-180px"></span><span style="width:600px;height:600px;margin-top:-300px"></span><span style="width:860px;height:860px;margin-top:-430px"></span><span style="width:1140px;height:1140px;margin-top:-570px"></span><span style="width:1440px;height:1440px;margin-top:-720px"></span><span style="width:1800px;height:1800px;margin-top:-900px"></span></div>
+
+<header class="top">
+  <div class="env">
+    <div class="marca"><b>RADAR</b><span>LAGUNERO</span></div>
+    <p class="sello">Actualizado 04/09/2026 a las 14:20 h<br>Comarca Lagunera · Coahuila y Durango</p>
+  </div>
+</header>
+
+<main>
+  <div class="env">
+
+    <section class="hero">
+      <p class="fecha">Viernes 4 de septiembre de 2026</p>
+      <h1 class="lluvia">Puede llover hoy</h1>
+      <p class="sub">en Torreón, Gómez Palacio y Lerdo</p>
+      <p class="prob">60%<small>Probabilidad ajustada</small></p>
+      <p><span class="badge c-baja">Confianza Baja</span></p>
+      <p class="lectura">Buenas posibilidades de lluvia, mucho calor, maxima cerca de 35 C, viento con rachas de 37 km/h, posible tolvanera. Los modelos no coinciden en la lluvia: seguimos pendientes.</p>
+    </section>
+
+    <section id="ciudades">
+      <h2>Hoy en la comarca<small>Mediana de los cinco modelos para cada ciudad.</small></h2>
+      <div class="ciudades">
+      <article class="ciudad destacada">
+        <header>
+          <h3>Torreón</h3>
+          <p class="temps"><b>35°</b> <span>/ 24°</span></p>
+        </header>
+        <p class="titularin lluvia">Puede llover hoy</p>
+        <div class="fila-barra"><div class="barra"><span style="width:60%"></span></div><b class="pct">60%</b></div>
+        <p class="detalle">lluvia estimada 0.2 mm · rachas 37 km/h</p>
+        <p class="confianza c-baja">Confianza baja · acuerdo 3/5 modelos</p>
+      </article>
+      <article class="ciudad">
+        <header>
+          <h3>Gómez Palacio</h3>
+          <p class="temps"><b>35°</b> <span>/ 24°</span></p>
+        </header>
+        <p class="titularin lluvia">Puede llover hoy</p>
+        <div class="fila-barra"><div class="barra"><span style="width:56%"></span></div><b class="pct">56%</b></div>
+        <p class="detalle">lluvia estimada 0.0 mm</p>
+        <p class="confianza c-baja">Confianza baja · acuerdo 2/5 modelos</p>
+      </article>
+      <article class="ciudad">
+        <header>
+          <h3>Lerdo</h3>
+          <p class="temps"><b>36°</b> <span>/ 24°</span></p>
+        </header>
+        <p class="titularin lluvia">Puede llover hoy</p>
+        <div class="fila-barra"><div class="barra"><span style="width:56%"></span></div><b class="pct">56%</b></div>
+        <p class="detalle">lluvia estimada 0.0 mm</p>
+        <p class="confianza c-baja">Confianza baja · acuerdo 2/5 modelos</p>
+      </article></div>
+    </section>
+
+    <section id="dias">
+      <h2>Los próximos días<small>La confianza baja conforme se aleja el pronóstico. Lo decimos en vez de esconderlo.</small></h2>
+      <div class="pestanas" role="tablist" data-tabs="#dias"><button role="tab" data-ciudad="torreon" aria-selected="true">Torreón</button><button role="tab" data-ciudad="gomez" aria-selected="false">Gómez Palacio</button><button role="tab" data-ciudad="lerdo" aria-selected="false">Lerdo</button></div>
+      <div class="panel-ciudad" data-ciudad="torreon"><ul class="tira"><li><span class="dia">Vie 4</span><span class="t">35° <i>24°</i></span><div class="barra"><span style="width:60%"></span></div><span class="p">60%</span><span class="cf c-baja">Baja</span></li><li><span class="dia">Sáb 5</span><span class="t">34° <i>22°</i></span><div class="barra"><span style="width:63%"></span></div><span class="p">63%</span><span class="cf c-baja">Baja</span></li><li><span class="dia">Dom 6</span><span class="t">34° <i>21°</i></span><div class="barra"><span style="width:75%"></span></div><span class="p">75%</span><span class="cf c-baja">Baja</span></li><li><span class="dia">Lun 7</span><span class="t">32° <i>21°</i></span><div class="barra"><span style="width:81%"></span></div><span class="p">81%</span><span class="cf c-baja">Baja</span></li><li><span class="dia">Mar 8</span><span class="t">33° <i>21°</i></span><div class="barra"><span style="width:81%"></span></div><span class="p">81%</span><span class="cf c-media">Media</span></li><li><span class="dia">Mié 9</span><span class="t">33° <i>21°</i></span><div class="barra"><span style="width:70%"></span></div><span class="p">70%</span><span class="cf c-baja">Baja</span></li><li><span class="dia">Jue 10</span><span class="t">33° <i>21°</i></span><div class="barra"><span style="width:61%"></span></div><span class="p">61%</span><span class="cf c-media">Media</span></li></ul>
+        <h3 class="subt">Los cinco modelos para hoy en Torreón</h3>
+        <table class="modelos">
+          <thead><tr><th>Modelo</th><th>Máx</th><th>Mín</th><th>Lluvia</th>
+          <th>Prob.</th><th>Rachas</th></tr></thead>
+          <tbody><tr><td>GFS (EE.UU.)</td><td>35.0°</td><td>21.5°</td><td>0.0 mm</td><td>7%</td><td>48 km/h</td></tr><tr><td>ECMWF (Europa)</td><td>36.6°</td><td>25.4°</td><td>1.3 mm</td><td>76%</td><td>32 km/h</td></tr><tr><td>ICON (Alemania)</td><td>34.6°</td><td>24.1°</td><td>0.2 mm</td><td>30%</td><td>37 km/h</td></tr><tr><td>GEM (Canada)</td><td>35.3°</td><td>18.9°</td><td>0.5 mm</td><td>67%</td><td>26 km/h</td></tr><tr><td>ARPEGE (Francia)</td><td>36.3°</td><td>27.1°</td><td>0.0 mm</td><td>—</td><td>38 km/h</td></tr></tbody>
+          <tfoot><tr><th>Consenso (mediana)</th><th>35.3°</th><th>24.1°</th>
+          <th>0.2 mm</th><th>60%</th><th>37 km/h</th></tr></tfoot>
+        </table></div><div class="panel-ciudad" data-ciudad="gomez" hidden><ul class="tira"><li><span class="dia">Vie 4</span><span class="t">35° <i>24°</i></span><div class="barra"><span style="width:56%"></span></div><span class="p">56%</span><span class="cf c-baja">Baja</span></li><li><span class="dia">Sáb 5</span><span class="t">34° <i>22°</i></span><div class="barra"><span style="width:67%"></span></div><span class="p">67%</span><span class="cf c-baja">Baja</span></li><li><span class="dia">Dom 6</span><span class="t">34° <i>21°</i></span><div class="barra"><span style="width:79%"></span></div><span class="p">79%</span><span class="cf c-baja">Baja</span></li><li><span class="dia">Lun 7</span><span class="t">32° <i>21°</i></span><div class="barra"><span style="width:81%"></span></div><span class="p">81%</span><span class="cf c-baja">Baja</span></li><li><span class="dia">Mar 8</span><span class="t">33° <i>21°</i></span><div class="barra"><span style="width:81%"></span></div><span class="p">81%</span><span class="cf c-media">Media</span></li><li><span class="dia">Mié 9</span><span class="t">33° <i>21°</i></span><div class="barra"><span style="width:70%"></span></div><span class="p">70%</span><span class="cf c-baja">Baja</span></li><li><span class="dia">Jue 10</span><span class="t">33° <i>21°</i></span><div class="barra"><span style="width:66%"></span></div><span class="p">66%</span><span class="cf c-baja">Baja</span></li></ul>
+        <h3 class="subt">Los cinco modelos para hoy en Gómez Palacio</h3>
+        <table class="modelos">
+          <thead><tr><th>Modelo</th><th>Máx</th><th>Mín</th><th>Lluvia</th>
+          <th>Prob.</th><th>Rachas</th></tr></thead>
+          <tbody><tr><td>GFS (EE.UU.)</td><td>35.4°</td><td>21.0°</td><td>0.0 mm</td><td>6%</td><td>48 km/h</td></tr><tr><td>ECMWF (Europa)</td><td>36.5°</td><td>25.3°</td><td>1.3 mm</td><td>76%</td><td>32 km/h</td></tr><tr><td>ICON (Alemania)</td><td>34.8°</td><td>23.9°</td><td>0.6 mm</td><td>30%</td><td>34 km/h</td></tr><tr><td>GEM (Canada)</td><td>35.3°</td><td>19.2°</td><td>0.0 mm</td><td>67%</td><td>17 km/h</td></tr><tr><td>ARPEGE (Francia)</td><td>36.3°</td><td>27.1°</td><td>0.0 mm</td><td>—</td><td>38 km/h</td></tr></tbody>
+          <tfoot><tr><th>Consenso (mediana)</th><th>35.4°</th><th>23.9°</th>
+          <th>0.0 mm</th><th>56%</th><th>34 km/h</th></tr></tfoot>
+        </table></div><div class="panel-ciudad" data-ciudad="lerdo" hidden><ul class="tira"><li><span class="dia">Vie 4</span><span class="t">36° <i>24°</i></span><div class="barra"><span style="width:56%"></span></div><span class="p">56%</span><span class="cf c-baja">Baja</span></li><li><span class="dia">Sáb 5</span><span class="t">34° <i>22°</i></span><div class="barra"><span style="width:67%"></span></div><span class="p">67%</span><span class="cf c-baja">Baja</span></li><li><span class="dia">Dom 6</span><span class="t">34° <i>21°</i></span><div class="barra"><span style="width:79%"></span></div><span class="p">79%</span><span class="cf c-baja">Baja</span></li><li><span class="dia">Lun 7</span><span class="t">32° <i>21°</i></span><div class="barra"><span style="width:81%"></span></div><span class="p">81%</span><span class="cf c-baja">Baja</span></li><li><span class="dia">Mar 8</span><span class="t">33° <i>21°</i></span><div class="barra"><span style="width:81%"></span></div><span class="p">81%</span><span class="cf c-media">Media</span></li><li><span class="dia">Mié 9</span><span class="t">33° <i>21°</i></span><div class="barra"><span style="width:70%"></span></div><span class="p">70%</span><span class="cf c-baja">Baja</span></li><li><span class="dia">Jue 10</span><span class="t">33° <i>21°</i></span><div class="barra"><span style="width:66%"></span></div><span class="p">66%</span><span class="cf c-baja">Baja</span></li></ul>
+        <h3 class="subt">Los cinco modelos para hoy en Lerdo</h3>
+        <table class="modelos">
+          <thead><tr><th>Modelo</th><th>Máx</th><th>Mín</th><th>Lluvia</th>
+          <th>Prob.</th><th>Rachas</th></tr></thead>
+          <tbody><tr><td>GFS (EE.UU.)</td><td>35.6°</td><td>21.1°</td><td>0.0 mm</td><td>7%</td><td>45 km/h</td></tr><tr><td>ECMWF (Europa)</td><td>36.5°</td><td>25.3°</td><td>1.3 mm</td><td>76%</td><td>32 km/h</td></tr><tr><td>ICON (Alemania)</td><td>34.8°</td><td>23.9°</td><td>0.6 mm</td><td>30%</td><td>34 km/h</td></tr><tr><td>GEM (Canada)</td><td>35.3°</td><td>19.2°</td><td>0.0 mm</td><td>67%</td><td>17 km/h</td></tr><tr><td>ARPEGE (Francia)</td><td>36.3°</td><td>27.1°</td><td>0.0 mm</td><td>—</td><td>38 km/h</td></tr></tbody>
+          <tfoot><tr><th>Consenso (mediana)</th><th>35.6°</th><th>23.9°</th>
+          <th>0.0 mm</th><th>56%</th><th>34 km/h</th></tr></tfoot>
+        </table></div>
+    </section>
+
+    <section id="metodo">
+      <h2>Cómo lo calculamos</h2>
+      <div class="metodo">
+        <div class="kv"><span>Modelos numéricos que coinciden en lluvia</span><span class="puntos"><i class="on"></i><i class="on"></i><i class="on"></i><i class="off"></i><i class="off"></i></span><b>3 de 5</b></div>
+        <div class="kv"><span>Miembros del ensemble del GFS con lluvia</span><b>21 de 30</b></div>
+        <div class="kv"><span>Dispersión entre modelos en la máxima</span><b>2.0 °C</b></div>
+        <div class="kv"><span>Confianza del pronóstico</span><b class="c-baja">Baja</b></div>
+        <p class="detalle" style="margin-top:16px">La probabilidad ajustada pondera el ensemble al 50%, la probabilidad media de los modelos al 30% y el acuerdo entre modelos deterministas al 20%. El ensemble pesa más porque es la única fuente que mide la incertidumbre de verdad.</p>
+      </div>
+    </section>
+
+    <section class="faq" id="preguntas">
+      <h2>Preguntas frecuentes</h2>
+      <details open><summary>¿Va a llover hoy en Torreón?</summary><p>Hay buenas posibilidades de que llueva en Torreón. La probabilidad ajustada es de 60%: 3 de 5 modelos numéricos dan lluvia y 21 de 30 miembros del ensemble del GFS también. La confianza del pronóstico es baja.</p></details><details><summary>¿Va a llover hoy en Gómez Palacio?</summary><p>Hay buenas posibilidades de que llueva en Gómez Palacio. La probabilidad ajustada es de 56%: 2 de 5 modelos numéricos dan lluvia y 21 de 30 miembros del ensemble del GFS también. La confianza del pronóstico es baja.</p></details><details><summary>¿Va a llover hoy en Lerdo?</summary><p>Hay buenas posibilidades de que llueva en Lerdo. La probabilidad ajustada es de 56%: 2 de 5 modelos numéricos dan lluvia y 21 de 30 miembros del ensemble del GFS también. La confianza del pronóstico es baja.</p></details><details><summary>¿Cómo calcula Radar Lagunero la probabilidad de lluvia?</summary><p>Consultamos cinco modelos numéricos independientes —GFS (Estados Unidos), ECMWF (Europa), ICON (Alemania), GEM (Canadá) y ARPEGE (Francia)— más el ensemble del GFS de 31 miembros. La probabilidad ajustada pondera la fracción de miembros del ensemble con lluvia (50%), la probabilidad media que reportan los modelos (30%) y la fracción de modelos deterministas que dan lluvia (20%). Publicamos también el nivel de acuerdo entre modelos y la confianza del pronóstico, incluso cuando es baja.</p></details>
+    </section>
+
+    <section id="avisos">
+      <p class="aviso"><b>Fenómenos peligrosos.</b> Para tolvaneras, granizo o inundaciones, la alerta formal la emiten el <a href="https://smn.conagua.gob.mx/" rel="noopener">SMN / CONAGUA</a> y Protección Civil. Radar Lagunero interpreta y traduce los modelos; no sustituye el aviso oficial.</p>
+    </section>
+
+  </div>
+</main>
+
+<footer>
+  <div class="env">
+    <p><b>Radar Lagunero</b> · Torreón, Gómez Palacio y Lerdo</p>
+    <p>Consenso de 5 modelos numéricos independientes + ensemble del GFS de 31 miembros.</p>
+    <p>Datos de <a href="https://open-meteo.com/" rel="noopener">Open-Meteo</a> (CC BY 4.0). Avisos oficiales: SMN / CONAGUA.</p>
+    <p>Datos abiertos de este pronóstico: <a href="/datos.json">datos.json</a></p>
+  </div>
+</footer>
+<script>
+document.querySelectorAll('[data-tabs]').forEach(function(g){
+  var btns=g.querySelectorAll('button[data-ciudad]');
+  btns.forEach(function(b){
+    b.addEventListener('click',function(){
+      var c=b.dataset.ciudad;
+      btns.forEach(function(x){
+        x.setAttribute('aria-selected', x===b ? 'true':'false');});
+      document.querySelectorAll(g.dataset.tabs+' .panel-ciudad')
+        .forEach(function(p){p.hidden = p.dataset.ciudad!==c;});
+    });
+  });
+});
+</script>
+</body>
+</html>

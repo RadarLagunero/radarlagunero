@@ -1,0 +1,274 @@
+{
+  "generado": "2026-09-04T14:20:08.925506-06:00",
+  "fuente": "Open-Meteo — 5 modelos + ensemble GFS (31 miembros)",
+  "licencia": "CC BY 4.0",
+  "ciudades": {
+    "torreon": {
+      "nombre": "Torreón",
+      "dias": [
+        {
+          "fecha": "2026-09-04",
+          "tmax": 35.3,
+          "tmin": 24.1,
+          "lluvia_mm": 0.2,
+          "rafaga_kmh": 37.4,
+          "prob_ajustada": 60.5,
+          "confianza": "BAJA",
+          "acuerdo_modelos": "3/5",
+          "ensemble": "21/30",
+          "lectura": "Buenas posibilidades de lluvia, mucho calor, maxima cerca de 35 C, viento con rachas de 37 km/h, posible tolvanera. Los modelos no coinciden en la lluvia: seguimos pendientes."
+        },
+        {
+          "fecha": "2026-09-05",
+          "tmax": 34.2,
+          "tmin": 22.3,
+          "lluvia_mm": 0.1,
+          "rafaga_kmh": 33.1,
+          "prob_ajustada": 62.88333333333333,
+          "confianza": "BAJA",
+          "acuerdo_modelos": "2/5",
+          "ensemble": "26/30",
+          "lectura": "Buenas posibilidades de lluvia, maxima cerca de 34 C. Los modelos no coinciden en la lluvia: seguimos pendientes."
+        },
+        {
+          "fecha": "2026-09-06",
+          "tmax": 33.6,
+          "tmin": 21.1,
+          "lluvia_mm": 1.2,
+          "rafaga_kmh": 25.9,
+          "prob_ajustada": 75.05833333333334,
+          "confianza": "BAJA",
+          "acuerdo_modelos": "4/5",
+          "ensemble": "29/30",
+          "lectura": "Lluvia muy probable, maxima cerca de 34 C. Hay hasta 4 grados de diferencia entre modelos en la temperatura."
+        },
+        {
+          "fecha": "2026-09-07",
+          "tmax": 32.4,
+          "tmin": 21.0,
+          "lluvia_mm": 6.3,
+          "rafaga_kmh": 22.7,
+          "prob_ajustada": 80.85833333333333,
+          "confianza": "BAJA",
+          "acuerdo_modelos": "5/5",
+          "ensemble": "29/30",
+          "lectura": "Lluvia muy probable, maxima cerca de 32 C. Hay hasta 6 grados de diferencia entre modelos en la temperatura."
+        },
+        {
+          "fecha": "2026-09-08",
+          "tmax": 33.25,
+          "tmin": 21.200000000000003,
+          "lluvia_mm": 1.75,
+          "rafaga_kmh": 34.95,
+          "prob_ajustada": 81.14166666666667,
+          "confianza": "MEDIA",
+          "acuerdo_modelos": "4/4",
+          "ensemble": "28/30",
+          "lectura": "Lluvia muy probable, maxima cerca de 33 C."
+        },
+        {
+          "fecha": "2026-09-09",
+          "tmax": 32.900000000000006,
+          "tmin": 20.85,
+          "lluvia_mm": 0.8,
+          "rafaga_kmh": 28.450000000000003,
+          "prob_ajustada": 69.58333333333334,
+          "confianza": "BAJA",
+          "acuerdo_modelos": "3/4",
+          "ensemble": "26/30",
+          "lectura": "Buenas posibilidades de lluvia, maxima cerca de 33 C. Los modelos no coinciden en la lluvia: seguimos pendientes."
+        },
+        {
+          "fecha": "2026-09-10",
+          "tmax": 33.099999999999994,
+          "tmin": 20.7,
+          "lluvia_mm": 0.0,
+          "rafaga_kmh": 24.299999999999997,
+          "prob_ajustada": 60.575,
+          "confianza": "MEDIA",
+          "acuerdo_modelos": "1/4",
+          "ensemble": "27/30",
+          "lectura": "Buenas posibilidades de lluvia, maxima cerca de 33 C."
+        }
+      ]
+    },
+    "gomez": {
+      "nombre": "Gómez Palacio",
+      "dias": [
+        {
+          "fecha": "2026-09-04",
+          "tmax": 35.4,
+          "tmin": 23.9,
+          "lluvia_mm": 0.0,
+          "rafaga_kmh": 33.8,
+          "prob_ajustada": 56.425,
+          "confianza": "BAJA",
+          "acuerdo_modelos": "2/5",
+          "ensemble": "21/30",
+          "lectura": "Buenas posibilidades de lluvia, mucho calor, maxima cerca de 35 C. Los modelos no coinciden en la lluvia: seguimos pendientes."
+        },
+        {
+          "fecha": "2026-09-05",
+          "tmax": 34.2,
+          "tmin": 22.2,
+          "lluvia_mm": 0.4,
+          "rafaga_kmh": 31.0,
+          "prob_ajustada": 66.95833333333334,
+          "confianza": "BAJA",
+          "acuerdo_modelos": "3/5",
+          "ensemble": "26/30",
+          "lectura": "Buenas posibilidades de lluvia, maxima cerca de 34 C. Los modelos no coinciden en la lluvia: seguimos pendientes."
+        },
+        {
+          "fecha": "2026-09-06",
+          "tmax": 33.6,
+          "tmin": 21.2,
+          "lluvia_mm": 1.2,
+          "rafaga_kmh": 29.5,
+          "prob_ajustada": 79.13333333333333,
+          "confianza": "BAJA",
+          "acuerdo_modelos": "5/5",
+          "ensemble": "29/30",
+          "lectura": "Lluvia muy probable, maxima cerca de 34 C. Hay hasta 4 grados de diferencia entre modelos en la temperatura."
+        },
+        {
+          "fecha": "2026-09-07",
+          "tmax": 32.2,
+          "tmin": 20.9,
+          "lluvia_mm": 6.3,
+          "rafaga_kmh": 22.7,
+          "prob_ajustada": 80.93333333333334,
+          "confianza": "BAJA",
+          "acuerdo_modelos": "5/5",
+          "ensemble": "29/30",
+          "lectura": "Lluvia muy probable, maxima cerca de 32 C. Hay hasta 5 grados de diferencia entre modelos en la temperatura."
+        },
+        {
+          "fecha": "2026-09-08",
+          "tmax": 33.0,
+          "tmin": 21.45,
+          "lluvia_mm": 1.75,
+          "rafaga_kmh": 34.05,
+          "prob_ajustada": 81.21666666666667,
+          "confianza": "MEDIA",
+          "acuerdo_modelos": "4/4",
+          "ensemble": "28/30",
+          "lectura": "Lluvia muy probable, maxima cerca de 33 C."
+        },
+        {
+          "fecha": "2026-09-09",
+          "tmax": 32.85,
+          "tmin": 20.75,
+          "lluvia_mm": 0.9,
+          "rafaga_kmh": 29.35,
+          "prob_ajustada": 69.58333333333334,
+          "confianza": "BAJA",
+          "acuerdo_modelos": "3/4",
+          "ensemble": "26/30",
+          "lectura": "Buenas posibilidades de lluvia, maxima cerca de 33 C. Los modelos no coinciden en la lluvia: seguimos pendientes."
+        },
+        {
+          "fecha": "2026-09-10",
+          "tmax": 33.15,
+          "tmin": 20.7,
+          "lluvia_mm": 0.15,
+          "rafaga_kmh": 25.55,
+          "prob_ajustada": 65.5,
+          "confianza": "BAJA",
+          "acuerdo_modelos": "2/4",
+          "ensemble": "27/30",
+          "lectura": "Buenas posibilidades de lluvia, maxima cerca de 33 C. Los modelos no coinciden en la lluvia: seguimos pendientes."
+        }
+      ]
+    },
+    "lerdo": {
+      "nombre": "Lerdo",
+      "dias": [
+        {
+          "fecha": "2026-09-04",
+          "tmax": 35.6,
+          "tmin": 23.9,
+          "lluvia_mm": 0.0,
+          "rafaga_kmh": 33.8,
+          "prob_ajustada": 56.5,
+          "confianza": "BAJA",
+          "acuerdo_modelos": "2/5",
+          "ensemble": "21/30",
+          "lectura": "Buenas posibilidades de lluvia, mucho calor, maxima cerca de 36 C. Los modelos no coinciden en la lluvia: seguimos pendientes."
+        },
+        {
+          "fecha": "2026-09-05",
+          "tmax": 34.3,
+          "tmin": 22.2,
+          "lluvia_mm": 0.4,
+          "rafaga_kmh": 31.0,
+          "prob_ajustada": 67.18333333333334,
+          "confianza": "BAJA",
+          "acuerdo_modelos": "3/5",
+          "ensemble": "26/30",
+          "lectura": "Buenas posibilidades de lluvia, maxima cerca de 34 C. Los modelos no coinciden en la lluvia: seguimos pendientes."
+        },
+        {
+          "fecha": "2026-09-06",
+          "tmax": 33.6,
+          "tmin": 21.2,
+          "lluvia_mm": 1.2,
+          "rafaga_kmh": 29.5,
+          "prob_ajustada": 79.43333333333334,
+          "confianza": "BAJA",
+          "acuerdo_modelos": "5/5",
+          "ensemble": "29/30",
+          "lectura": "Lluvia muy probable, maxima cerca de 34 C. Hay hasta 4 grados de diferencia entre modelos en la temperatura."
+        },
+        {
+          "fecha": "2026-09-07",
+          "tmax": 32.2,
+          "tmin": 20.9,
+          "lluvia_mm": 6.3,
+          "rafaga_kmh": 22.7,
+          "prob_ajustada": 81.08333333333334,
+          "confianza": "BAJA",
+          "acuerdo_modelos": "5/5",
+          "ensemble": "29/30",
+          "lectura": "Lluvia muy probable, maxima cerca de 32 C. Hay hasta 5 grados de diferencia entre modelos en la temperatura."
+        },
+        {
+          "fecha": "2026-09-08",
+          "tmax": 33.0,
+          "tmin": 21.45,
+          "lluvia_mm": 1.75,
+          "rafaga_kmh": 34.05,
+          "prob_ajustada": 81.29166666666666,
+          "confianza": "MEDIA",
+          "acuerdo_modelos": "4/4",
+          "ensemble": "28/30",
+          "lectura": "Lluvia muy probable, maxima cerca de 33 C."
+        },
+        {
+          "fecha": "2026-09-09",
+          "tmax": 32.85,
+          "tmin": 20.75,
+          "lluvia_mm": 0.9,
+          "rafaga_kmh": 29.35,
+          "prob_ajustada": 69.65833333333333,
+          "confianza": "BAJA",
+          "acuerdo_modelos": "3/4",
+          "ensemble": "26/30",
+          "lectura": "Buenas posibilidades de lluvia, maxima cerca de 33 C. Los modelos no coinciden en la lluvia: seguimos pendientes."
+        },
+        {
+          "fecha": "2026-09-10",
+          "tmax": 33.15,
+          "tmin": 20.7,
+          "lluvia_mm": 0.15,
+          "rafaga_kmh": 25.55,
+          "prob_ajustada": 65.575,
+          "confianza": "BAJA",
+          "acuerdo_modelos": "2/4",
+          "ensemble": "27/30",
+          "lectura": "Buenas posibilidades de lluvia, maxima cerca de 33 C. Los modelos no coinciden en la lluvia: seguimos pendientes."
+        }
+      ]
+    }
+  }
+}

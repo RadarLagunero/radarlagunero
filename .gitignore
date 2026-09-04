@@ -1,5 +1,7 @@
 __pycache__/
 *.pyc
 .DS_Store
-/datos.json
-/tarjeta.png
+fonts/
+# El sitio se genera en cada corrida; no se versiona.
+public/*
+!public/aciertos.json

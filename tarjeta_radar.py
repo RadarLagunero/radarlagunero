@@ -228,7 +228,7 @@ def construir(datos, salida="public/tarjeta.png"):
     # Pie
     centrar(d, "radarlagunero.com  ·  método y aciertos publicados",
             fuente("Medium", 24), H - 92, CIAN)
-    centrar(d, "Avisos oficiales: SMN / CONAGUA  ·  datos de Open-Meteo (CC BY 4.0)",
+    centrar(d, "Avisos oficiales: SMN / CONAGUA y Protección Civil",
             fuente("Light", 21), H - 56, GRIS)
 
     os.makedirs(os.path.dirname(salida) or ".", exist_ok=True)

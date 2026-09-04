@@ -227,9 +227,6 @@ def bloque_aciertos(m):
           Cuando el día pasa, lo comparamos contra lo que registró el observatorio
           del aeropuerto de Torreón y publicamos el resultado aquí, salga como
           salga. Todavía no hay días completos que calificar.</p>
-          <p class="mnota">La bitácora en bruto ya está abierta:
-          <a href="/pronosticos_log.csv">pronósticos emitidos</a> ·
-          <a href="/observaciones_mmtc.csv">observaciones del aeropuerto</a></p>
         </div>"""
 
     hs = [h for h in m["por_horizonte"] if h["error_medio_tmax"] is not None][:5]
@@ -257,10 +254,6 @@ def bloque_aciertos(m):
           <th>Error en la máxima</th><th>Acierto en lluvia</th><th>Días</th>
           </tr></thead><tbody>%s</tbody></table>
           %s
-          <p class="mnota">Datos en bruto:
-          <a href="/pronosticos_log.csv">pronósticos</a> ·
-          <a href="/observaciones_mmtc.csv">observaciones</a> ·
-          <a href="/aciertos.json">marcador en JSON</a></p>
         </div>""" % (m["dias_verificados"], esc(m["desde"]), esc(m["hasta"]),
                      num(m.get("error_medio_tmax_global"), "%.1f"), filas, fiab)
 
@@ -490,20 +483,15 @@ def pagina(datos, aciertos):
             "ellos a la vista." % (p, num(t0["tmax"]), n_mie, n_cen))
 
     faqs = [
-        ("¿Va a llover hoy en Torreón?",
-         "%s La probabilidad de que caiga más de 1 mm es de %d%%, contando %d "
-         "escenarios de %d centros meteorológicos. Entre el centro más seco y el "
-         "más lluvioso hay %d puntos de diferencia, así que la confianza de este "
-         "pronóstico es %s." % (lect.split(".")[0] + ".", p, n_mie, n_cen,
-                                round(hoy["desacuerdo"] or 0),
-                                hoy["confianza_lluvia"].lower())),
         ("¿Cómo se calcula esta probabilidad?",
-         "Se cuentan, uno por uno, los %d escenarios que producen los ensembles del "
-         "GFS (NOAA, Estados Unidos), ICON (DWD, Alemania), IFS (ECMWF, Europa) y "
-         "GEM (ECCC, Canadá). La probabilidad es la fracción de esos escenarios que "
-         "supera el umbral. No hay pesos, ni fórmulas propias, ni correcciones a "
-         "mano: cualquiera con acceso a la misma API pública puede repetir la cuenta "
-         "y obtener el mismo número." % n_mie),
+         "Los centros meteorológicos no corren su modelo una sola vez: lo corren "
+         "decenas de veces, cambiando apenas las condiciones iniciales, para ver de "
+         "cuántas maneras distintas puede terminar el día. Aquí se juntan esas "
+         "corridas de cuatro centros —GFS (NOAA, Estados Unidos), ICON (DWD, "
+         "Alemania), IFS (ECMWF, Europa) y GEM (ECCC, Canadá)— y se cuentan una por "
+         "una: hoy son %d escenarios. La probabilidad es simplemente la fracción de "
+         "esos escenarios en los que llueve más que el umbral. No hay pesos, ni "
+         "fórmulas propias, ni correcciones a mano." % n_mie),
         ("¿Por qué el pronóstico de lluvia es igual para las tres ciudades?",
          "Porque a la resolución de los modelos globales, Torreón, Gómez Palacio y "
          "Lerdo caen prácticamente en la misma celda de la rejilla. Publicar tres "
@@ -512,8 +500,7 @@ def pagina(datos, aciertos):
         ("¿Qué tan bien le atinan?",
          "Cada pronóstico queda guardado con su fecha y se compara después contra lo "
          "que registró el observatorio del aeropuerto de Torreón. El marcador está "
-         "publicado en esta misma página y los datos en bruto se pueden descargar. "
-         "Si le erramos, ahí se ve."),
+         "publicado en esta misma página. Si le erramos, ahí se ve."),
     ]
     faq_html = "".join("<details%s><summary>%s</summary><p>%s</p></details>"
                        % (" open" if i == 0 else "", esc(q), esc(r))
@@ -534,15 +521,6 @@ def pagina(datos, aciertos):
          "name": "Clima en Torreón hoy — Radar Lagunero",
          "isPartOf": {"@id": SITIO + "/#web"},
          "datePublished": datos["generado"], "dateModified": datos["generado"]},
-        {"@type": "Dataset", "@id": SITIO + "/#datos",
-         "name": "Pronóstico por ensemble multi-modelo — Comarca Lagunera",
-         "description": "Probabilidad de lluvia por umbral, acumulados esperados y "
-                        "desacuerdo entre centros, actualizado cada hora.",
-         "license": "https://creativecommons.org/licenses/by/4.0/",
-         "creator": {"@id": SITIO + "/#org"},
-         "distribution": [{"@type": "DataDownload",
-                           "encodingFormat": "application/json",
-                           "contentUrl": SITIO + "/datos.json"}]},
         {"@type": "FAQPage", "@id": SITIO + "/#faq",
          "isPartOf": {"@id": SITIO + "/#pagina"},
          "mainEntity": [{"@type": "Question", "name": q,
@@ -594,7 +572,7 @@ def pagina(datos, aciertos):
       <a href="#hoy">Hoy</a><a href="#horas">Por horas</a>
       <a href="#centros">Los cuatro centros</a><a href="#dias">7 días</a>
       <a href="#polvo">Tolvaneras</a><a href="#aciertos">Aciertos</a>
-      <a href="#metodo">Metodología</a>
+      <a href="#preguntas">Preguntas</a>
     </nav>
   </div>
 </header>
@@ -684,37 +662,6 @@ def pagina(datos, aciertos):
       <div class="caja">%(aciertos)s</div>
     </section>
 
-    <section id="metodo" class="metodo">
-      <h2>Cómo se calcula, paso por paso</h2>
-      <p class="intro">Si algo de esta página no se puede reproducir, no debería
-      estar publicado. Este es el método completo.</p>
-      <div class="caja">
-        <ol>
-          <li>Se piden a Open-Meteo los ensembles de cuatro centros: <b>GFS</b>
-          (NOAA, EE.UU.), <b>ICON</b> (DWD, Alemania), <b>IFS</b> (ECMWF, Europa) y
-          <b>GEM</b> (ECCC, Canadá). Cada uno entrega decenas de corridas con
-          condiciones iniciales ligeramente distintas: <b>%(nmie)d escenarios</b> en
-          total para hoy.</li>
-          <li>Para cada umbral se cuenta cuántos escenarios lo superan y se divide
-          entre el total: <code>P = escenarios que superan el umbral / total</code>.
-          Sin pesos, sin factores, sin ajustes a mano.</li>
-          <li>El titular usa el umbral de <b>1 mm en 24 horas</b>, que es la lluvia
-          que de verdad se nota en la calle. Se publican también 0.2, 5 y 20 mm.</li>
-          <li>Las cifras se redondean al 5%% más cercano. Decir "57%%" fingiría una
-          precisión que el método no tiene.</li>
-          <li>La <b>confianza</b> no es una opinión: es la distancia entre el centro
-          más seco y el más lluvioso. Hasta 25 puntos y a tres días o menos, alta;
-          hasta 40 puntos, media; más que eso, baja.</li>
-          <li>La <b>temperatura</b> es la mediana de cinco modelos deterministas y se
-          calcula por ciudad.</li>
-          <li>Cada pronóstico se guarda con fecha y hora y, cuando el día termina, se
-          compara contra el observatorio del aeropuerto de Torreón (MMTC).</li>
-        </ol>
-        <div class="kv" style="margin-top:16px"><span>Actualización</span><b>cada hora</b></div>
-        <div class="kv"><span>Umbral del titular</span><b>1 mm en 24 horas</b></div>
-      </div>
-    </section>
-
     <section class="faq" id="preguntas">
       <h2>Preguntas frecuentes</h2>
       %(faq)s
@@ -742,19 +689,18 @@ def pagina(datos, aciertos):
         y los aciertos a la vista.</p>
       </div>
       <div>
-        <h3>Fuentes</h3>
-        <p>Modelos numéricos vía <a href="https://open-meteo.com/" rel="noopener">Open-Meteo</a>,
-        licencia CC BY 4.0.<br>
-        Observaciones: METAR de MMTC, <a href="https://aviationweather.gov/" rel="noopener">NOAA
-        Aviation Weather Center</a>.<br>
-        Avisos oficiales: <a href="https://smn.conagua.gob.mx/" rel="noopener">SMN / CONAGUA</a>.</p>
+        <h3>Cómo se calcula</h3>
+        <p>Se cuentan las corridas de los ensembles de cuatro centros
+        meteorológicos —NOAA, DWD, ECMWF y ECCC— y la probabilidad es la fracción
+        de esas corridas que supera el umbral. La temperatura es la mediana de
+        cinco modelos deterministas, ciudad por ciudad.</p>
       </div>
       <div>
-        <h3>Datos abiertos</h3>
-        <p><a href="/datos.json">Pronóstico en JSON</a><br>
-        <a href="/pronosticos_log.csv">Bitácora de pronósticos</a><br>
-        <a href="/observaciones_mmtc.csv">Observaciones del aeropuerto</a><br>
-        <a href="/aciertos.json">Marcador de aciertos</a></p>
+        <h3>Verificación</h3>
+        <p>Cada pronóstico se guarda con fecha y hora y se compara después contra
+        el observatorio del aeropuerto de Torreón (MMTC). El marcador está
+        publicado en esta misma página.<br>
+        Avisos oficiales: <a href="https://smn.conagua.gob.mx/" rel="noopener">SMN / CONAGUA</a>.</p>
       </div>
     </div>
     <p>Radar Lagunero · Torreón, Coahuila · %(anio)d</p>

@@ -711,8 +711,7 @@ def pagina(datos, aciertos):
           compara contra el observatorio del aeropuerto de Torreón (MMTC).</li>
         </ol>
         <div class="kv" style="margin-top:16px"><span>Actualización</span><b>cada hora</b></div>
-        <div class="kv"><span>Código fuente</span><b><a href="https://github.com/DrJaaz/radarlagunero">github.com/DrJaaz/radarlagunero</a></b></div>
-        <div class="kv"><span>Datos abiertos de esta página</span><b><a href="/datos.json">datos.json</a></b></div>
+        <div class="kv"><span>Umbral del titular</span><b>1 mm en 24 horas</b></div>
       </div>
     </section>
 

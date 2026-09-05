@@ -213,8 +213,9 @@ def construir(datos, salida="public/tarjeta.png"):
     Y_CIFRA     = 272
     Y_SUBTITULO = 430
     Y_RANGO     = 500
-    Y_CENTROS   = 560          # encabezado "LO QUE DICE CADA CENTRO"
-    PASO_CENTRO = 48
+    Y_HORAS     = 556          # franja "¿a qué hora?"
+    ALTO_BARRAS = 126
+    Y_RESUMEN   = 812          # una línea con el desacuerdo entre centros
     Y_LLUVIA    = 856          # panel "si llueve, ¿cuánta?"
     ALTO_LLUVIA = 132
     Y_ACUMULADO = 1000
@@ -251,24 +252,52 @@ def construir(datos, salida="public/tarjeta.png"):
     d.rounded_rectangle([mx - 3, Y_RANGO - 7, mx + 3, Y_RANGO + 25],
                         radius=3, fill=BLANCO)
 
-    # ------------------------------------------------- Los cuatro centros
-    d.text((70, Y_CENTROS), "LO QUE DICE CADA CENTRO",
-           font=fuente("Bold", 27), fill=CIAN)
-    y = Y_CENTROS + 46
-    for clave in ["gfs025", "icon_seamless", "ecmwf_ifs025", "gem_global"]:
-        if clave not in centros:
-            continue
-        d.text((78, y), nombres.get(clave, clave),
-               font=fuente("Medium", 29), fill=BLANCO)
-        barra(d, 240, y + 12, W - 240 - 190, 16, centros[clave])
-        derecha(d, texto_pct(centros[clave]), fuente("Bold", 30), W - 70, y - 3, CIAN)
-        y += PASO_CENTRO
+    # ------------------------------------------------------ ¿A qué hora?
+    # Lo que la gente realmente pregunta. La serie viene del modelo determinista
+    # de referencia, no del ensemble, así que las barras marcan el MOMENTO del
+    # día, no el nivel: se dice en la propia tarjeta para no fingir precisión.
+    horas = datos.get("por_hora") or []
+    if horas:
+        pico = max(horas, key=lambda x: x["prob_pct"])
+        tope = max(2, max(x["prob_pct"] for x in horas))
 
+        d.text((70, Y_HORAS), "¿A QUÉ HORA?", font=fuente("Bold", MIN_LEGIBLE),
+               fill=CIAN)
+        if pico["prob_pct"] > 0:
+            derecha(d, "más probable cerca de las %s" % pico["hora"],
+                    fuente("Medium", MIN_LEGIBLE), W - 70, Y_HORAS, BLANCO)
+
+        base = Y_HORAS + 42 + ALTO_BARRAS          # línea de piso de las barras
+        paso = (W - 140) / len(horas)
+        ancho_b = min(paso - 10, 56)
+        for i, x in enumerate(horas):
+            cx = 70 + i * paso + (paso - ancho_b) / 2
+            alto = max(4, ALTO_BARRAS * x["prob_pct"] / tope)
+            es_pico = x is pico and pico["prob_pct"] > 0
+            d.rounded_rectangle([cx, base - alto, cx + ancho_b, base],
+                                radius=6, fill=BLANCO if es_pico else CIAN + (105,))
+            # una etiqueta cada tres horas: más que eso no se lee en el muro
+            if i % 3 == 0:
+                centrar(d, x["hora"][:2] + "h", fuente("Light", MIN_LEGIBLE),
+                        base + 10, GRIS, cx - 12, cx + ancho_b + 12)
+
+        d.line([(70, base), (W - 70, base)], fill=CIAN_T, width=2)
+        centrar(d, "Marca el momento del día, no el nivel",
+                fuente("Light", MIN_LEGIBLE), base + 48, GRIS)
+
+    # Los cuatro centros ya no se desglosan aquí —eso vive en el sitio—, pero el
+    # desacuerdo entre ellos sí se queda: es lo que sostiene la confianza.
+    vals_o = sorted(centros.values())
     conf = hoy["confianza_lluvia"]
     col = {"ALTA": VERDE, "MEDIA": AMBAR, "BAJA": ROJO}.get(conf, GRIS)
-    d.text((78, y + 2), "Diferencia entre ellos: %d puntos  ·  confianza %s"
-           % (round(hoy["desacuerdo_pts"] or 0), conf.lower()),
-           font=fuente("Light", 27), fill=col)
+    lo_o, hi_o = redondear(vals_o[0]), redondear(vals_o[-1])
+    if lo_o == hi_o:
+        resumen = "Los %d centros coinciden en %d%%  ·  confianza %s" % (
+            len(centros), lo_o, conf.lower())
+    else:
+        resumen = "Los %d centros van de %d%% a %d%%  ·  confianza %s" % (
+            len(centros), lo_o, hi_o, conf.lower())
+    centrar(d, resumen, fuente("Light", 27), Y_RESUMEN, col)
 
     # ---------------------------------------------------- ¿Cuánta lluvia?
     # Esto sí cambia todos los días: qué tan probable es que solo caigan gotas,

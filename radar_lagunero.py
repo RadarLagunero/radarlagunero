@@ -551,6 +551,34 @@ def recolectar(dias, ciudades=None):
     return salida
 
 
+def serie_horaria(horario, horas=15):
+    """Las próximas horas, para responder '¿a qué hora?' en el JSON público.
+
+    Ojo: esto viene del modelo determinista de referencia, no del ensemble de
+    139 miembros. Sirve para ubicar el MOMENTO del día en que es más probable
+    que caiga, no para leer el nivel: ese nivel puede no coincidir con el
+    porcentaje del titular, y el sitio lo dice abiertamente.
+    """
+    if not horario or "hourly" not in horario:
+        return []
+    h = horario["hourly"]
+    ahora = datetime.now(ZONA_LOCAL).replace(tzinfo=None, minute=0, second=0,
+                                             microsecond=0)
+    fuera = []
+    for i, t in enumerate(h["time"]):
+        cuando = datetime.strptime(t, "%Y-%m-%dT%H:%M")
+        if cuando < ahora:
+            continue
+        if len(fuera) >= horas:
+            break
+        fuera.append({
+            "hora": t[11:16],
+            "prob_pct": int(h["precipitation_probability"][i] or 0),
+            "temp": h["temperature_2m"][i],
+        })
+    return fuera
+
+
 def a_json_publico(datos):
     """El JSON abierto que publica el sitio. Que se pueda auditar es el punto."""
     out = {
@@ -565,6 +593,10 @@ def a_json_publico(datos):
         "licencia": "Datos de Open-Meteo, CC BY 4.0",
         "comarca": [],
         "ciudades": {},
+        "por_hora": serie_horaria(
+            (datos["ciudades"].get("torreon") or {}).get("horario")),
+        "nota_por_hora": ("Serie del modelo determinista de referencia, no del "
+                          "ensemble. Marca el momento del día, no el nivel."),
     }
     for f, a in zip(datos["fechas"], datos["lluvia"]):
         out["comarca"].append({

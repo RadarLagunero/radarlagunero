@@ -1,9 +1,37 @@
 {
-  "generado": "2026-09-05T08:54:06.715156-06:00",
-  "dias_verificados": 0,
+  "generado": "2026-09-06T09:14:15.880322-06:00",
   "estacion": {
     "icao": "MMTC",
     "nombre": "Aeropuerto Internacional Francisco Sarabia (Torreón)"
   },
-  "nota": "Aún no hay días completos que verificar."
+  "dias_verificados": 1,
+  "pronosticos_evaluados": 3,
+  "desde": "2026-09-05",
+  "hasta": "2026-09-05",
+  "error_medio_tmax_global": 1.43,
+  "sesgo_tmax_global": 1.43,
+  "por_horizonte": [
+    {
+      "horizonte_dias": 0,
+      "n_dias": 3,
+      "error_medio_tmax": 1.43,
+      "sesgo_tmax": 1.43,
+      "brier": 0.74,
+      "acierto_lluvia_pct": 0,
+      "n_lluvia": 3
+    }
+  ],
+  "fiabilidad": [
+    {
+      "rango": "80-99%",
+      "n": 3,
+      "prob_media": 86,
+      "observado_pct": 0
+    }
+  ],
+  "notas": [
+    "El METAR de MMTC no reporta milímetros acumulados: se verifica si llovió o no, nunca cuánto.",
+    "La estación reporta de madrugada a las 22 h aproximadamente. La máxima y la mínima caen dentro de esa ventana, pero una lluvia de madrugada puede no quedar registrada: por eso 'llovió' es un piso.",
+    "Se evalúa un solo pronóstico por día y horizonte: el último emitido antes de que empezara el día."
+  ]
 }
